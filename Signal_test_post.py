@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import xlrd
 import os
 import math
+import sympy
 
 
 def create_worksheet(table, sheet):
@@ -46,7 +47,7 @@ def maxes_of_list_y(y):
 
 def reduce_array(indexes, arr):
     # возвращает массив, элементов с индексами indexes из массива arr
-    j = 0
+    # по сути нужен для получения массива, состоящего только из локальных максимумов
     final_arr = []
     for i in indexes:
         final_arr.append(arr[i])
@@ -111,6 +112,7 @@ def peak_picking_method(index_max, y, x):
     # print(x_right)
 
     delta_w = x_right - x_left
+    # print(delta_w)
     return delta_w/(2*x[index_max])
 
 
@@ -136,49 +138,57 @@ def Analitic_ACHX_array (list_A, list_lambda, list_w, list_trans_max, diapason):
     return [list_x, list_y]
 
 
+def absol (list):
+    # функция возвращает абсолютные значения списка
+    for i in range(len(list)):
+        list[i] = abs(list[i])
+    return list
 
-list_x = []
-list_y = []
-for i in range(1000):
-    list_x.append(i/100)
-    # temp1 = 10*math.exp( -0.6*abs(list_x[i] - 3) )*math.sin(10*list_x[i])
-    # temp2 = 0
-    temp1 = 0
-    temp2 = Function_ACHX([10, 50],[0.6, 1],[10, 20],[2, 8], list_x[i])
-    temp = temp1 + temp2
-    list_y.append(temp)
-graphic_my(list_x, list_y)
 
+def summa (list):
+    # Возвращает сумму элементов списка
+    temp = 0
+    for i in range(len(list)):
+        temp += list[i]
+    return temp
 
 
 # print(os.listdir()) # нужно, чтобы правильно ввести название excel-файла
 
 # получение листа из таблицы
-worksheet = create_worksheet('Signal_Table.xls', 'Sheet_1')
+# worksheet = create_worksheet('Signal_Table.xls', 'Sheet_1')
 
 # Задание функции АЧХ аналитически для проверки
-
+# Получение координаты по х и по у аналитически через коэффициенты
+temp_f = Analitic_ACHX_array([10, 20], [0.6, 0.8], [10, 30], [2, 10], [20,0.01])
+x = temp_f[0]
+y = absol(temp_f[1])
 
 # Вытаскиваниие из лист координат х и у точек
-x = table_data(worksheet, 1)
-y = table_data(worksheet, 2)
+# x = table_data(worksheet, 1)
+# y = table_data(worksheet, 2)
 
 # убирание точек вокруг локальных максимумов
 # в принципе, здесь надо делать сглаживание/аппроксимацию/интерполяцию
 # для входных данных, т.к. пик может получиться слишком тонким
-a = (reduce_loop(5, x, y))
+a = (reduce_loop(1, x, y))
 x = a[0]
 y = a[1]
 
+
 # Получение матрицы с 5 локальными экстремумами, отсортированными по убыванию
-Extremums = some_rezonanses(4, y, x)
-print(Extremums[0], "\n", Extremums[1])
+Extremums = some_rezonanses(2, y, x)
+print(Extremums[0], "\n", Extremums[1], "\n", Extremums[2] )
+
+print(sympy.nsolve([summa( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) ),summa(( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) )*(x[Extremums[2][0]] - 10)]   ) )
+
 
 # Применение метода половинной мощности
-for i in range(4):
+for i in range(2):
     print("Демфирование для ", i+1, " резонанса ", peak_picking_method(Extremums[2][i], y, x))
 
 # Построение графика
-# graphic_my(x, y)
-
+plt.plot(temp_f[0],temp_f[1],
+         x,y)
+plt.show()
 
