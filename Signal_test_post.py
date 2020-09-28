@@ -206,4 +206,4 @@ Disc_freq = 2*math.pi/diapason[0]
 # plt.plot(temp_f[0],temp_f[1])
 plt.plot(fftfreq(len(spectrum), Disc_freq), absol(spectrum)/len(spectrum) )
 plt.show()
-
+# добавил преобразоване Фурье
