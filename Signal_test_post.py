@@ -3,6 +3,9 @@ import xlrd
 import os
 import math
 import sympy
+from numpy import array, arange, abs as np_abs
+from numpy.fft import fft, fftfreq
+from numpy.random import uniform
 
 
 def create_worksheet(table, sheet):
@@ -160,9 +163,16 @@ def summa (list):
 
 # Задание функции АЧХ аналитически для проверки
 # Получение координаты по х и по у аналитически через коэффициенты
-temp_f = Analitic_ACHX_array([10, 20], [0.6, 0.8], [10, 30], [2, 10], [20,0.01])
+list_A = [10, 20]
+list_lambda = [0.1, 5]
+list_w = [10, 50]
+list_trans_w = [2, 10]
+diapason = [10, 0.01]
+temp_f = Analitic_ACHX_array(list_A, list_lambda, list_w, list_trans_w, diapason)
 x = temp_f[0]
-y = absol(temp_f[1])
+y = temp_f[1]
+# y = absol(temp_f[1])
+
 
 # Вытаскиваниие из лист координат х и у точек
 # x = table_data(worksheet, 1)
@@ -171,24 +181,29 @@ y = absol(temp_f[1])
 # убирание точек вокруг локальных максимумов
 # в принципе, здесь надо делать сглаживание/аппроксимацию/интерполяцию
 # для входных данных, т.к. пик может получиться слишком тонким
-a = (reduce_loop(1, x, y))
-x = a[0]
-y = a[1]
+# a = (reduce_loop(1, x, y))
+# x = a[0]
+# y = a[1]
 
+# Дискретное преобразование Фурье над двумерным массивом
+spectrum = fft(y, n=None, axis=-1)
+spectrum = spectrum[:len(spectrum)//2]
+print(spectrum)
+Disc_freq = 2*math.pi/diapason[0]
 
 # Получение матрицы с 5 локальными экстремумами, отсортированными по убыванию
-Extremums = some_rezonanses(2, y, x)
-print(Extremums[0], "\n", Extremums[1], "\n", Extremums[2] )
+# Extremums = some_rezonanses(2, y, x)
+# print(Extremums[0], "\n", Extremums[1], "\n", Extremums[2] )
 
-print(sympy.nsolve([summa( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) ),summa(( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) )*(x[Extremums[2][0]] - 10)]   ) )
+# print(sympy.nsolve([summa( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) ),summa(( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) )*(x[Extremums[2][0]] - 10)]   ) )
 
 
 # Применение метода половинной мощности
-for i in range(2):
-    print("Демфирование для ", i+1, " резонанса ", peak_picking_method(Extremums[2][i], y, x))
+# for i in range(2):
+#     print("Демфирование для ", i+1, " резонанса ", peak_picking_method(Extremums[2][i], y, x))
 
 # Построение графика
-plt.plot(temp_f[0],temp_f[1],
-         x,y)
+# plt.plot(temp_f[0],temp_f[1])
+plt.plot(fftfreq(len(spectrum), Disc_freq), absol(spectrum)/len(spectrum) )
 plt.show()
 
