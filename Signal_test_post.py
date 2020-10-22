@@ -1,11 +1,11 @@
 import matplotlib.pyplot as plt
 import xlrd
-import os
+# import os
 import math
-import sympy
-from numpy import array, arange, abs as np_abs
+# import sympy
+# from numpy import array, arange, abs as np_abs
 from numpy.fft import fft, fftfreq
-from numpy.random import uniform
+# from numpy.random import uniform
 
 
 def create_worksheet(table, sheet):
@@ -122,7 +122,7 @@ def peak_picking_method(index_max, y, x):
 def Function_ACHX (list_A, list_lambda, list_w, list_trans_max, t):
     # Функция, аналитически задающая возбуждение на определенных частотах
     # list_A - это список амплитуд. list_lambda - это список коэффициентов затухания
-    # list_w - список частот возбуждения. list_trans_max - список частот, на которых происходит возбуждение
+    # list_w - список частот возбуждения. list_trans_max - список времен, на которых происходит возбуждение
     # t - аргумент
     y = 0
     for i in range(len(list_A)):
@@ -164,10 +164,10 @@ def summa (list):
 # Задание функции АЧХ аналитически для проверки
 # Получение координаты по х и по у аналитически через коэффициенты
 list_A = [10, 20]
-list_lambda = [0.1, 5]
-list_w = [10, 50]
-list_trans_w = [2, 10]
-diapason = [10, 0.01]
+list_lambda = [0.8, 5]
+list_w = [20, 40]
+list_trans_w = [0, 0]
+diapason = [20, 0.01]
 temp_f = Analitic_ACHX_array(list_A, list_lambda, list_w, list_trans_w, diapason)
 x = temp_f[0]
 y = temp_f[1]
@@ -188,23 +188,27 @@ y = temp_f[1]
 # Дискретное преобразование Фурье над двумерным массивом
 spectrum = fft(y, n=None, axis=-1)
 spectrum = spectrum[:len(spectrum)//2]
-print(spectrum)
-Disc_freq = 2*math.pi/diapason[0]
+# print(spectrum)
+Disc_freq = diapason[1]
 
 # Получение матрицы с 5 локальными экстремумами, отсортированными по убыванию
-# Extremums = some_rezonanses(2, y, x)
-# print(Extremums[0], "\n", Extremums[1], "\n", Extremums[2] )
+Extremums = some_rezonanses(2, y, x)
+print(Extremums[0], "\n", Extremums[1], "\n", Extremums[2] )
 
 # print(sympy.nsolve([summa( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) ),summa(( math.log(A) + y[Extremums[2][0]] - lmb*(x[Extremums[2][0]] - 10) )*(x[Extremums[2][0]] - 10)]   ) )
 
 
 # Применение метода половинной мощности
-# for i in range(2):
-#     print("Демфирование для ", i+1, " резонанса ", peak_picking_method(Extremums[2][i], y, x))
+for i in range(2):
+    print("Демфирование для ", i+1, " резонанса ", peak_picking_method(Extremums[2][i], y, x))
 
 # Построение графика
 # plt.plot(temp_f[0],temp_f[1])
-plt.plot(fftfreq(len(spectrum), Disc_freq), absol(spectrum)/len(spectrum) )
+# rect = [0, 0, 1, 1]
+fig = plt.figure()
+# ax = fig.add_axes(rect)
+plt.plot(fftfreq(len(spectrum), Disc_freq), absol(spectrum)/len(spectrum), 'g' )
+plt.xlim([0, 50])
 plt.show()
 # добавил преобразоване Фурье
 # Добавил ещё что-то
