@@ -123,7 +123,7 @@ def peak_picking_an(index_max, y, x):
     return delta_w / (2 * x[index_max])
 
 
-def peak_picking(w_arr, a_arr, w_rez, a_rez):
+def peak_picking(w_arr, a_arr, w_rez):
     # Входные параметры: АЧХ  и частота, которую прикидываем резонансной
     # Реализация метода половинной мощности
     # Делается так: от пика спускаемся в каждую сторону до тех пор,
@@ -144,7 +144,7 @@ def peak_picking(w_arr, a_arr, w_rez, a_rez):
     # Движение влево
     i = index_max
     # print('y/sqrt(2)',y[index_max]/(2**(1/2)))
-    while a_arr[i] >= a_rez / (2 ** (1 / 2)):
+    while a_arr[i] >= a_arr[index_max] / (2 ** (1 / 2)):
         i -= 1
     temp = line_2_dots(w_arr[i], a_arr[i], w_arr[i + 1], a_arr[i + 1])
     w_left = (a_arr[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
@@ -152,7 +152,7 @@ def peak_picking(w_arr, a_arr, w_rez, a_rez):
 
     # то же самое, но для правой точки
     i = index_max
-    while a_arr[i] >= a_rez / (2 ** (1 / 2)):
+    while a_arr[i] >= a_arr[index_max] / (2 ** (1 / 2)):
         i += 1
     temp = line_2_dots(w_arr[i], a_arr[i], w_arr[i - 1], a_arr[i - 1])
     w_right = (a_arr[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]

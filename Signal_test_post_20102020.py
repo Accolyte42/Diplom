@@ -13,7 +13,7 @@ from Mymodules import *
 # Задание функции АЧХ аналитически для проверки
 # Получение координаты по х и по у аналитически через коэффициенты
 list_A = [10, 50]
-list_lambda = [0.7, 6]
+list_lambda = [0.4, 3]
 list_w = [10, 30]
 diapason = [60, 0.01]
 temp_f = analitic_disp_array(list_A, list_lambda, list_w, diapason)
@@ -49,16 +49,13 @@ y = spctr[:len(spctr)//2]
 #     print("Демфирование для ", i+1, " резонанса ", peak_picking_an(Extremums[2][i], y, x))
 
 # Получение по МПМ демпфирования для заданной частоты
-chosen_rez = (30, 414)
-dempf = peak_picking(x, y, chosen_rez[0], chosen_rez[1])
-print('Демфирование для ', chosen_rez, ' резонанса ', dempf)
-print('Декремент ', chosen_rez[0]*dempf)
+chosen_rez = 10  # выбранная частота резонанса
+dempf = peak_picking(x, y, chosen_rez)  # демпфирование по МПМ
+print('Демфирование для резонанса ', chosen_rez, ' \t', dempf)
+print('Логарифмический декремент затухания \t', chosen_rez*dempf)
 
 # Построение графика
-# plt.plot(temp_f[0],temp_f[1])
-# rect = [0, 0, 1, 1]
 fig = plt.figure()
-# ax = fig.add_axes(rect)
 plt.plot(x, y, 'g')
 plt.xlim([0, 50])
 plt.show()
