@@ -96,7 +96,7 @@ def line_2_dots(x1, y1, x2, y2):
     return [k, b]
 
 
-def peak_picking_an(index_max, y, x):
+def peak_picking_an(index_max, x, y):
     # Реализация метода половинной мощности
     # Делается так: от пика спускаемся в каждую сторону до тех пор,
     # пока у[i] не будет меньше заданного значения, а потом линейной
@@ -141,26 +141,7 @@ def peak_picking(w_arr, a_arr, w_rez):
     else:
         index_max = index_l
 
-    # Движение влево
-    i = index_max
-    # print('y/sqrt(2)',y[index_max]/(2**(1/2)))
-    while a_arr[i] >= a_arr[index_max] / (2 ** (1 / 2)):
-        i -= 1
-    temp = line_2_dots(w_arr[i], a_arr[i], w_arr[i + 1], a_arr[i + 1])
-    w_left = (a_arr[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    print('w_left', w_left)
-
-    # то же самое, но для правой точки
-    i = index_max
-    while a_arr[i] >= a_arr[index_max] / (2 ** (1 / 2)):
-        i += 1
-    temp = line_2_dots(w_arr[i], a_arr[i], w_arr[i - 1], a_arr[i - 1])
-    w_right = (a_arr[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    print('w_rigth', w_right)
-
-    delta_w = w_right - w_left
-    # print(delta_w)
-    return delta_w / (2 * w_rez)
+    return peak_picking_an(index_max, w_arr, a_arr)
 
 
 def function_disp(list_a, list_lambda, list_w, t):
