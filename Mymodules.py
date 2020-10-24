@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import xlrd
 # import os
 import math
+import numpy as np
 
 
 # import sympy
@@ -107,7 +108,7 @@ def peak_picking_an(index_max, x, y):
         i -= 1
     temp = line_2_dots(x[i], y[i], x[i + 1], y[i + 1])
     x_left = (y[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    # print('x_left',x_left)
+    # print('x_left', x_left)
 
     # то же самое, но для правой точки
     i = index_max
@@ -115,15 +116,16 @@ def peak_picking_an(index_max, x, y):
         i += 1
     temp = line_2_dots(x[i], y[i], x[i - 1], y[i - 1])
     x_right = (y[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    # print(x_right)
+    # print('x_rigth', x_right)
 
     delta_w = x_right - x_left
     # print(delta_w)
     # print(delta_w)
+    print(x[index_max])
     return delta_w / (2 * x[index_max])
 
 
-def peak_picking(w_arr, a_arr, w_rez):
+def peak_picking(w_arr, a_arr, w_list):
     # Входные параметры: АЧХ  и частота, которую прикидываем резонансной
     # Реализация метода половинной мощности
     # Делается так: от пика спускаемся в каждую сторону до тех пор,
@@ -132,16 +134,25 @@ def peak_picking(w_arr, a_arr, w_rez):
 
     step = w_arr[1] - w_arr[0]  # шаг по частотам
 
-    index_l = int(w_rez // step)  # индекс левой точки от заданной
-    index_r = index_l + 1  # индекс правой точки от заданной
+    index_max = [0]*len(w_list)
+    dempf_arr = [0]*len(w_list)
+    w_rez = [0]*len(w_list)
 
-    # Получаем индекс ближайшей максимальной точки
-    if a_arr[index_r] > a_arr[index_l]:
-        index_max = index_r
-    else:
-        index_max = index_l
+    for i in range(len(w_list)):
+        index_l = int((w_list[i][0]) // step)  # индекс левой точки от заданной
+        index_r = int((w_list[i][1]) // step)  # индекс правой точки от заданной
 
-    return peak_picking_an(index_max, w_arr, a_arr)
+        # Получение индекса точки с максимальной амплитудой на участке
+        index_max[i] = int(index_l)
+        for j in range(index_l, index_r):
+            if a_arr[j] > a_arr[index_max[i]]:
+                index_max[i] = j
+
+        # создание вектора демпфирований
+        dempf_arr[i] = peak_picking_an(index_max[i], w_arr, a_arr)
+        w_rez[i] = w_arr[index_max[i]]
+
+    return [w_rez, dempf_arr]
 
 
 def function_disp(list_a, list_lambda, list_w, t):
@@ -151,7 +162,7 @@ def function_disp(list_a, list_lambda, list_w, t):
     # t - аргумент
     y = 0
     for i in range(len(list_a)):
-        y += list_a[i] * math.exp(-list_lambda[i] * abs(t)) * math.sin(list_w[i] * t)
+        y += list_a[i] * math.exp(-list_lambda[i] * abs(t)) * math.sin(list_w[i]*2*math.pi * t)
     return y
 
 
@@ -164,6 +175,14 @@ def analitic_disp_array(list_a, list_lambda, list_w, diapason):
         list_x.append(i * diapason[1])
         list_y.append(function_disp(list_a, list_lambda, list_w, list_x[i]))
     return [list_x, list_y]
+
+
+def nextpow2(p):
+    n = 2
+    while p < n:
+        n *= 2
+    return n
+
 
 
 def absol(lst):
