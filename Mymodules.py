@@ -155,7 +155,7 @@ def peak_picking(w_arr, a_arr, w_list):
     return [w_rez, dempf_arr]
 
 
-def function_disp(list_a, list_lambda, list_w, t):
+def function_displ(list_a, list_lambda, list_w, t):
     # Функция, аналитически задающая перемещение на определенных частотах
     # list_A - это список амплитуд. list_lambda - это список коэффициентов затухания
     # list_w - список частот возбуждения. list_trans_max - список времен, на которых происходит возбуждение
@@ -166,23 +166,15 @@ def function_disp(list_a, list_lambda, list_w, t):
     return y
 
 
-def analitic_disp_array(list_a, list_lambda, list_w, diapason):
+def analitic_displ_array(list_a, list_lambda, list_w, diapason):
     # daipason -> [max_x, length_step] подразумевается, что они делятся без остатка, хотя могут и не делиться
     # функция, возвращающая список точек по х и по y при применении аналитической функции к аргументу х
-    list_x = []
-    list_y = []
-    for i in range(round(diapason[0] / diapason[1])):
-        list_x.append(i * diapason[1])
-        list_y.append(function_disp(list_a, list_lambda, list_w, list_x[i]))
+    list_x = [0]*int(diapason[0] // diapason[1])
+    list_y = [0]*int(diapason[0] // diapason[1])
+    for i in range(round(diapason[0] // diapason[1])):
+        list_x[i] = i * diapason[1]
+        list_y[i] = function_displ(list_a, list_lambda, list_w, list_x[i])
     return [list_x, list_y]
-
-
-def nextpow2(p):
-    n = 2
-    while p < n:
-        n *= 2
-    return n
-
 
 
 def absol(lst):
