@@ -3,7 +3,7 @@ import xlrd
 # import os
 import math
 import numpy as np
-
+import Config
 
 # import sympy
 # from numpy import array, arange, abs as np_abs
@@ -121,7 +121,6 @@ def peak_picking_an(index_max, x, y):
     delta_w = x_right - x_left
     # print(delta_w)
     # print(delta_w)
-    print(x[index_max])
     return delta_w / (2 * x[index_max])
 
 
@@ -137,22 +136,24 @@ def peak_picking(w_arr, a_arr, w_list):
     index_max = [0]*len(w_list)
     dempf_arr = [0]*len(w_list)
     w_rez = [0]*len(w_list)
+    ampl_rez = [0]*len(w_list)
 
     for i in range(len(w_list)):
         index_l = int((w_list[i][0]) // step)  # индекс левой точки от заданной
         index_r = int((w_list[i][1]) // step)  # индекс правой точки от заданной
 
         # Получение индекса точки с максимальной амплитудой на участке
-        index_max[i] = int(index_l)
+        index_max[i] = index_l
         for j in range(index_l, index_r):
             if a_arr[j] > a_arr[index_max[i]]:
                 index_max[i] = j
+        ampl_rez[i] = a_arr[index_max[i]]  # вектор резонансных амплитуд
 
         # создание вектора демпфирований
         dempf_arr[i] = peak_picking_an(index_max[i], w_arr, a_arr)
         w_rez[i] = w_arr[index_max[i]]
 
-    return [w_rez, dempf_arr]
+    return [w_rez, dempf_arr, ampl_rez]
 
 
 def function_displ(list_a, list_lambda, list_w, t):
@@ -168,13 +169,36 @@ def function_displ(list_a, list_lambda, list_w, t):
 
 def analitic_displ_array(list_a, list_lambda, list_w, diapason):
     # daipason -> [max_x, length_step] подразумевается, что они делятся без остатка, хотя могут и не делиться
+    # daipason - это время испытаний и раз в сколько секунд снимаем показания
     # функция, возвращающая список точек по х и по y при применении аналитической функции к аргументу х
     list_x = [0]*int(diapason[0] // diapason[1])
     list_y = [0]*int(diapason[0] // diapason[1])
-    for i in range(round(diapason[0] // diapason[1])):
+    for i in range(int(diapason[0] // diapason[1])):
         list_x[i] = i * diapason[1]
         list_y[i] = function_displ(list_a, list_lambda, list_w, list_x[i])
     return [list_x, list_y]
+
+
+def one_degree_coef(w, ksi, A):
+    # Функция, около резонанса преобразующая исходную систему в одностепенную систему
+    # Получает на вход амплитуду на (резонансе, частоту резонанса и демпфирование)
+    # Возвращает вектор (m,c,k) <-> (масса, кф_демпфирования, жесткость)
+    k = ( 2*A*ksi*(1-ksi**2)**(1/2) )**(-1)
+    m = k/w**2*(1-4*ksi**2)
+    c = 2*ksi*(k*m)**(1/2)
+    Config.m = m
+    Config.C = c
+    Config.k = k
+    return [m, c, k]
+
+
+def H_per(w, m, c, k):
+    # комплексная передаточная функция H(iw)
+    # m = Config.m
+    # c = Config.C
+    # k = Config.k
+    temp = abs((k + c*w*1j - m*(w)**2)**(-1))
+    return temp
 
 
 def absol(lst):
