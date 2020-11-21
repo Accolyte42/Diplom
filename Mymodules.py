@@ -102,21 +102,27 @@ def peak_picking_an(index_max, x, y):
     # Делается так: от пика спускаемся в каждую сторону до тех пор,
     # пока у[i] не будет меньше заданного значения, а потом линейной
     # интерполяцией находится значение частоты для левой частоты
+    # print('kor_2', y[index_max] / (2 ** (1 / 2)))
     i = index_max
+    # print('Ampl max', y[index_max])
     # print('y/sqrt(2)',y[index_max]/(2**(1/2)))
     while y[i] >= y[index_max] / (2 ** (1 / 2)):
         i -= 1
+    # print(y[i], y[i+1])
     temp = line_2_dots(x[i], y[i], x[i + 1], y[i + 1])
+    # print(temp)
     x_left = (y[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    # print('x_left', x_left)
+    # print('x_left', x_left, y[index_max] / (2 ** (1 / 2)))
 
     # то же самое, но для правой точки
     i = index_max
     while y[i] >= y[index_max] / (2 ** (1 / 2)):
         i += 1
+    # print('gfdgsdf',y[i], y[i - 1])
     temp = line_2_dots(x[i], y[i], x[i - 1], y[i - 1])
+    # print(temp)
     x_right = (y[index_max] / (2 ** (1 / 2)) - temp[1]) / temp[0]
-    # print('x_rigth', x_right)
+    # print('x_rigth', x_right, y[i])
 
     delta_w = x_right - x_left
     # print(delta_w)
@@ -192,12 +198,12 @@ def one_degree_coef(w, ksi, A):
     return [m, c, k]
 
 
-def H_per(w, m, c, k):
-    # комплексная передаточная функция H(iw)
+def h_per(w, m, c, k):
+    # модуль комплексной передаточной функции H(iw)
     # m = Config.m
     # c = Config.C
     # k = Config.k
-    temp = abs((k + c*w*1j - m*(w)**2)**(-1))
+    temp = abs((k + c*w*1j - m*w**2)**(-1))
     return temp
 
 
