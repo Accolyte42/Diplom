@@ -3,7 +3,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from Mymodules import analitic_displ_array as an_displ
-from Mymodules import peak_picking, one_degree_coef, h_per
+from Mymodules import peak_picking, one_degree_coef, h_per, arr_sensor
 import Config
 
 # print(os.listdir()) # нужно, чтобы правильно ввести название excel-файла
@@ -19,22 +19,41 @@ list_w = [8, 14]
 diapason = [70, 0.01]
 displ_arr = an_displ(list_A, list_lambda, list_w, diapason)
 
-# Чтение из файла Cur_FRF_wing.txt массив данных с датчиков
-read_file = np.loadtxt("Cur_FRF_wing.txt")
-print(read_file.item)
-
-
 # fig = plt.figure()
 # plt.plot(displ_arr[0], displ_arr[1], 'g')
 # plt.xlim([0, 5])
 # plt.show()
 
-# Дискретное преобразование Фурье над двумерным массивом
-Ampl_c = np.fft.fft(displ_arr[1])  # Массив комплексных амплитуд в АЧХ
-N = len(displ_arr[1])  # количество точек
-freq = np.linspace(0, 1/(displ_arr[0][1] - displ_arr[0][0]), N)[:(N//2)]
-Ampl = (1/N) * np.abs(Ampl_c)[:(N//2)] * 2     # Массив действительных амплитуд АЧХ
-Ampl_phs = (1/N) * np.angle(Ampl_c)[:(N//2)]   # Массив фаз для ФЧХ
+## Дискретное преобразование Фурье над двумерным массивом
+# Ampl_c = np.fft.fft(displ_arr[1])  # Массив комплексных амплитуд в АЧХ
+# N = len(displ_arr[1])  # количество точек
+# freq = np.linspace(0, 1/(displ_arr[0][1] - displ_arr[0][0]), N)[:(N//2)]
+# Ampl = (1/N) * np.abs(Ampl_c)[:(N//2)] * 2     # Массив действительных амплитуд АЧХ
+# Ampl_phs = (1/N) * np.angle(Ampl_c)[:(N//2)]   # Массив фаз для ФЧХ
+
+
+# Чтение из файла Cur_FRF_wing.txt массив данных с датчиков
+read_file = np.loadtxt("Cur_FRF_wing.txt")
+# print(read_file.shape[0])  # 336
+freq = read_file[:, 0]
+Ampl_c = arr_sensor(read_file)
+N = read_file.shape[0]  # количество точек
+Ampl = (1/N) * np.abs(Ampl_c)[:(N)] * 2     # Массив действительных амплитуд АЧХ
+Ampl_phs = (1/N) * np.angle(Ampl_c)[:(N)]   # Массив фаз для ФЧХ
+# print(Ampl_c)
+# np.savetxt('test1.txt', Ampl_c)
+
+# Построение графиков
+fig = plt.figure()
+ax = fig.add_subplot(111)
+
+ax.plot(freq, Ampl, 'g', label='Эксперимент')  # График АЧХ экспериментальный
+ax.set_xlabel('Частота в герцах')
+ax.set_ylabel('Амплитуда')
+ax.legend()
+
+plt.show()
+
 
 
 # Выбранные интервалы для резонансной частоты

@@ -185,6 +185,31 @@ def analitic_displ_array(list_a, list_lambda, list_w, diapason):
     return [list_x, list_y]
 
 
+def arr_sensor(data_array):
+    # Двумерный массив с комплексными значениями на датчиках
+    # по горизонтали - значения на заданной частоте, по вертикали значения на одном датчике
+    row = data_array.shape[0]  # 336
+    col = data_array.shape[1]  # 23
+    arr_sen = np.zeros((row, col-1), dtype = np.complex64)  # Собственно сам нужный массив
+    for j in range(0, row):
+        check = False
+        for i in range(1, col):
+            # Проверки, действительная или мнимая сейчас часть
+            if (i % 2) == 1:
+                Ree = data_array[j, i]
+            else:
+                Imm = data_array[j, i]
+                check = True
+            # Когда завершилось очередная мнимая часть, записывам число
+            if check:
+                arr_sen[j, (i - 1) // 2] = Ree + 1j*Imm
+                check = False
+
+    return arr_sen
+
+
+
+
 def one_degree_coef(w, ksi, A):
     # Функция, около резонанса преобразующая исходную систему в одностепенную систему
     # Получает на вход амплитуду на (резонансе, частоту резонанса и демпфирование)
