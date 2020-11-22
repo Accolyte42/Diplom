@@ -28,6 +28,7 @@ displ_arr = an_displ(list_A, list_lambda, list_w, diapason)
 # Ampl_c = np.fft.fft(displ_arr[1])  # Массив комплексных амплитуд в АЧХ
 # N = len(displ_arr[1])  # количество точек
 # freq = np.linspace(0, 1/(displ_arr[0][1] - displ_arr[0][0]), N)[:(N//2)]
+# 1 / N is a normalization factor
 # Ampl = (1/N) * np.abs(Ampl_c)[:(N//2)] * 2     # Массив действительных амплитуд АЧХ
 # Ampl_phs = (1/N) * np.angle(Ampl_c)[:(N//2)]   # Массив фаз для ФЧХ
 
@@ -42,14 +43,16 @@ Ampl_arr = (1/N) * np.abs(Ampl_c_arr)    # Массив действительн
 Ampl_phs_arr = (1/N) * np.angle(Ampl_c_arr)   # Массив фаз для ФЧХ
 # print(Ampl_c_arr)
 # np.savetxt('test1.txt', Ampl_c_arr)
-Src_snsr = 6
+
+# Рассматриваемый датчик
+Src_snsr = Config.Src_snsr
 Ampl = Ampl_arr[:, Src_snsr]
 Ampl_phs = Ampl_phs_arr[:, Src_snsr]
 
 # Построение графиков
 # Построение графика АЧХ
 fig = plt.figure()
-ax = fig.add_subplot(211)
+ax = fig.add_subplot(311)
 ax.plot(freq, Ampl, 'g', label='Действ')  # График АЧХ экспериментальный
 ax.set_xlabel('Частота в герцах')
 ax.set_ylabel('Амплитуда')
@@ -57,19 +60,25 @@ ax.grid()
 ax.legend()
 
 # Построение графика ФЧХ
-ax = fig.add_subplot(212)
+ax = fig.add_subplot(312)
 ax.plot(freq, Ampl_phs, 'g', label='Мним')  # График ФЧХ экспериментальный
 ax.set_xlabel('Частота в герцах')
 ax.set_ylabel('Амплитуда')
 ax.grid()
 ax.legend()
+
+# Построение графика АЧХ для всех датчиков
+ax = fig.add_subplot(313)
+ax.plot(freq, Ampl_arr, 'g')  # График ФЧХ экспериментальный
+ax.set_xlabel('Частота в герцах')
+ax.set_ylabel('Амплитуда')
+ax.grid()
 # Отображение
 plt.show()
 
 
 # Выбранные интервалы для резонансной частоты
-w_list = [[180,   210],
-          [230, 260]]
+w_list = Config.w_list
 
 # Получение по МПМ демпфирования для заданной частоты
 dempf = peak_picking(freq, Ampl, w_list)  # демпфирование по МПМ
@@ -87,7 +96,7 @@ print('Погрешность логарифм декремент', inaccur_deck
 print('Погрешность резонансных частот', inaccur_chastot)
 
 # нахождение массы, демпф и жесткости для одностеп системы
-Num_des_r = 0  # номер искомого резонанса
+Num_des_r = Config.Num_des_r  # номер искомого резонанса. Нумерация идет по тому, как в w_list диапазоны заданы
 [m, c, k] = one_degree_coef(dempf[0][Num_des_r], dempf[1][Num_des_r], dempf[2][Num_des_r])
 
 # массив точек АЧХ для одностеп системы

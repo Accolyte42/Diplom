@@ -217,9 +217,7 @@ def one_degree_coef(w, ksi, A):
     k = ( 2*A*ksi*(1-ksi**2)**(1/2) )**(-1)
     m = k/w**2*(1-4*ksi**2)
     c = 2*ksi*(k*m)**(1/2)
-    Config.m = m
-    Config.C = c
-    Config.k = k
+
     return [m, c, k]
 
 
