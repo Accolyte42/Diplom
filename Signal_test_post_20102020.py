@@ -36,29 +36,40 @@ displ_arr = an_displ(list_A, list_lambda, list_w, diapason)
 read_file = np.loadtxt("Cur_FRF_wing.txt")
 # print(read_file.shape[0])  # 336
 freq = read_file[:, 0]
-Ampl_c = arr_sensor(read_file)
+Ampl_c_arr = arr_sensor(read_file)  # Массив перед ф-ций для всех точек
 N = read_file.shape[0]  # количество точек
-Ampl = (1/N) * np.abs(Ampl_c)[:(N)] * 2     # Массив действительных амплитуд АЧХ
-Ampl_phs = (1/N) * np.angle(Ampl_c)[:(N)]   # Массив фаз для ФЧХ
-# print(Ampl_c)
-# np.savetxt('test1.txt', Ampl_c)
+Ampl_arr = (1/N) * np.abs(Ampl_c_arr)    # Массив действительных амплитуд АЧХ
+Ampl_phs_arr = (1/N) * np.angle(Ampl_c_arr)   # Массив фаз для ФЧХ
+# print(Ampl_c_arr)
+# np.savetxt('test1.txt', Ampl_c_arr)
+Src_snsr = 6
+Ampl = Ampl_arr[:, Src_snsr]
+Ampl_phs = Ampl_phs_arr[:, Src_snsr]
 
 # Построение графиков
+# Построение графика АЧХ
 fig = plt.figure()
-ax = fig.add_subplot(111)
-
-ax.plot(freq, Ampl, 'g', label='Эксперимент')  # График АЧХ экспериментальный
+ax = fig.add_subplot(211)
+ax.plot(freq, Ampl, 'g', label='Действ')  # График АЧХ экспериментальный
 ax.set_xlabel('Частота в герцах')
 ax.set_ylabel('Амплитуда')
+ax.grid()
 ax.legend()
 
+# Построение графика ФЧХ
+ax = fig.add_subplot(212)
+ax.plot(freq, Ampl_phs, 'g', label='Мним')  # График ФЧХ экспериментальный
+ax.set_xlabel('Частота в герцах')
+ax.set_ylabel('Амплитуда')
+ax.grid()
+ax.legend()
+# Отображение
 plt.show()
 
 
-
 # Выбранные интервалы для резонансной частоты
-w_list = [[6,   9],
-          [12, 16]]
+w_list = [[180,   210],
+          [230, 260]]
 
 # Получение по МПМ демпфирования для заданной частоты
 dempf = peak_picking(freq, Ampl, w_list)  # демпфирование по МПМ
@@ -94,9 +105,4 @@ ax.set_xlabel('Частота в герцах')
 ax.set_ylabel('Амплитуда')
 ax.legend()
 
-# plt.show()
-
-
-# fig, ax = plt.subplots()
-# ax.plot(freq, X_phs, 'g')
-# plt.show()
+plt.show()
