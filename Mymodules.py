@@ -131,7 +131,7 @@ def peak_picking_an(index_max, x, y):
 
 
 def peak_picking(w_arr, a_arr, w_list):
-    # Входные параметры: АЧХ  и частота, которую прикидываем резонансной
+    # Входные параметры: (w и A) от АЧХ  и частота, которую прикидываем резонансной
     # Реализация метода половинной мощности
     # Делается так: от пика спускаемся в каждую сторону до тех пор,
     # пока у[i] не будет меньше заданного значения, а потом линейной
@@ -172,6 +172,9 @@ def function_displ(list_a, list_lambda, list_w, t):
         y += list_a[i] * math.exp(-list_lambda[i] * abs(t)) * math.sin(list_w[i]*2*math.pi * t)
     return y
 
+def OMA_1_sen(list_a, list_t):
+    # list_a - массив амплитуд в зависимости от массива времен list_t
+    return 1
 
 def analitic_displ_array(list_a, list_lambda, list_w, diapason):
     # daipason -> [max_x, length_step] подразумевается, что они делятся без остатка, хотя могут и не делиться
